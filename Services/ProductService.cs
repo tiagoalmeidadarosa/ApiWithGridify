@@ -4,18 +4,23 @@ using Gridify;
 
 namespace ApiWithGridify.Services
 {
-    public interface IProductService
+    public class ProductService
     {
-        Paging<Product> GetFilteredProducts(GridifyQuery gridifyQuery);
-    }
+        private readonly ProductRepository _productRepository;
 
-    public class ProductService(IProductRepository productRepository) : IProductService
-    {
-        private readonly IProductRepository _productRepository = productRepository;
+        public ProductService(ProductRepository productRepository)
+        {
+            _productRepository = productRepository;
+        }
 
         public Paging<Product> GetFilteredProducts(GridifyQuery gridifyQuery)
         {
-            var products = _productRepository.GetProducts().Gridify(gridifyQuery);
+            var products = _productRepository.GetProducts()
+                //.ApplyFiltering(gridifyQuery)
+                //.ApplyOrdering(gridifyQuery)
+                //.ApplyPaging(gridifyQuery.Page, gridifyQuery.PageSize)
+                .Gridify(gridifyQuery);
+
             return products;
         }
     }

@@ -1,7 +1,5 @@
 using ApiWithGridify.Repository;
 using ApiWithGridify.Services;
-using Gridify;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddSingleton<ProductRepository>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -22,13 +21,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.MapGet("/products", ([AsParameters] GridifyQuery gridifyQuery, [FromServices] IProductService productService) =>
-{
-    var products = productService.GetFilteredProducts(gridifyQuery);
-    return products;
-})
-.WithName("GetProducts")
-.WithOpenApi();
+app.UseAuthorization();
+app.MapControllers();
 
 await app.RunAsync();
